@@ -1,0 +1,23 @@
+[project]
+name = "chunk-explorer"
+version = "0.1.0"
+description = "Interactive visualization tool for exploring and comparing text chunking strategies"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.13.4",
+    "kmp-util>=1.0.3",
+    "langchain-text-splitters>=0.3.8",
+    "nltk>=3.9.1",
+    "pip>=25.0.1",
+    "sentencepiece>=0.2.0",
+    "spacy>=3.8.5",
+    "streamlit>=1.44.1",
+    "tiktoken>=0.9.0",
+    "transformers>=4.51.3",
+]
+
+[tool.ruff]
+line-length = 120
+lint.ignore = ["PLR"]
+lint.extend-select = ["I", "UP", "PL"]
+target-version = "py312"
