@@ -4,6 +4,10 @@ A powerful tool for exploring and visualizing different text chunking strategies
 
 ## 🚀 [Try the Demo](https://chunkers.streamlit.app/)
 
+
+https://github.com/user-attachments/assets/3aabf071-15f6-4302-9678-a76b6c766123
+
+
 ## Features
 
 The Chunk Explorer provides:
@@ -24,7 +28,7 @@ The Chunk Explorer provides:
 
 Here's an example of how the Chunk Explorer visualizes text chunks:
 
-TODO: Add image
+![image](https://github.com/user-attachments/assets/a5cf9b3e-eda1-4670-a692-8f29bacd07fa)
 
 Each chunk is color-coded and interactive:
 - Hover over chunks to see metadata
