@@ -317,7 +317,7 @@ def main():
     # Update session state with current text
     st.session_state.input_text = input_text
 
-    if st.button("Split Text"):
+    def perform_split():
         if not input_text:
             st.warning("Please enter some text to split.")
             return
@@ -407,6 +407,9 @@ def main():
             html(content, scrolling=True, height=1000)
         except Exception as e:
             raise e
+
+    # Perform split automatically when text or parameters change
+    perform_split()
 
 
 if __name__ == "__main__":
