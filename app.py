@@ -322,7 +322,8 @@ def main():
         st.help(selected_splitter["class_"])
         # also baseclasses
         for base in selected_splitter["class_"].__bases__:
-            st.help(base)
+            if base is not object:  # Skip builtins.object()
+                st.help(base)
     # Get custom parameters from user
     with st.expander("Splitter Parameters", expanded=True):
         custom_params = adapt_langchain_splitter_to_streamlit(selected_splitter)
