@@ -19,6 +19,7 @@ from langchain_text_splitters import (
 from transformers import AutoTokenizer
 
 from texts import TEXT_HTML, TEXT_MARKDOWN, TEXT_PLAIN
+from wordllama_adapter import WordLlamaTextSplitter
 
 
 class Splitter(TypedDict):
@@ -70,14 +71,22 @@ SPLITTERS: list[Splitter] = [
     },
     {
         "class_": NLTKTextSplitter,
-        "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False, "add_start_index": True},
+        "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False},
         "name": "🦜🔗 NLTKTextSplitter",
         "showcase_text": TEXT_PLAIN,
     },
     {
         "class_": SpacyTextSplitter,
-        "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False, "add_start_index": True},
+        "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False},
         "name": "🦜🔗 SpacyTextSplitter",
+        "showcase_text": TEXT_PLAIN,
+    },
+    {
+        "class_": WordLlamaTextSplitter,
+        "kwargs": {
+            "target_size": 100,
+        },
+        "name": "🦙 WordLlamaTextSplitter",
         "showcase_text": TEXT_PLAIN,
     },
 ]
@@ -350,7 +359,7 @@ def adapt_langchain_splitter_to_streamlit(splitter: Splitter) -> dict:
 
 def find_longest_suffix_prefix_match(text1: str, text2: str) -> tuple[int, int]:
     """Find the longest suffix of text1 that matches a prefix of text2.
-    
+
     Returns:
         tuple[int, int]: (left_overlap, right_overlap) where:
             - left_overlap: negative number indicating how much text1 overlaps with text2
@@ -360,10 +369,10 @@ def find_longest_suffix_prefix_match(text1: str, text2: str) -> tuple[int, int]:
     for i in range(1, min(len(text1), len(text2)) + 1):
         if text1[-i:] == text2[:i]:
             max_match = i
-    
+
     if max_match == 0:
         return (0, 0)
-    
+
     return (-max_match, max_match)
 
 
@@ -387,7 +396,7 @@ def identify_overlaps(
             if left < 0:  # Only record if there is an actual overlap
                 overlaps[i] = (left, right)
             continue
-            
+
         assert s2 > s1, f"s2 must be greater than s1, but s1={s1}, s2={s2}"
         left = s2 - s1 - len_1
         right = s1 - s2 + len_1

@@ -216,6 +216,7 @@ dependencies = [
     { name = "streamlit" },
     { name = "tiktoken" },
     { name = "transformers" },
+    { name = "wordllama" },
 ]
 
 [package.metadata]
@@ -231,6 +232,7 @@ requires-dist = [
     { name = "streamlit", specifier = ">=1.44.1" },
     { name = "tiktoken", specifier = ">=0.9.0" },
     { name = "transformers", specifier = ">=4.51.3" },
+    { name = "wordllama", specifier = ">=0.3.9" },
 ]
 
 [[package]]
@@ -1676,6 +1678,30 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a7/1a/9c522dd61b52939c217925d3e55c95f9348b73a66a956f52608e1e59a2c0/weasel-0.4.1.tar.gz", hash = "sha256:aabc210f072e13f6744e5c3a28037f93702433405cd35673f7c6279147085aa9", size = 38417 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2a/87/abd57374044e1f627f0a905ac33c1a7daab35a3a815abfea4e1bafd3fdb1/weasel-0.4.1-py3-none-any.whl", hash = "sha256:24140a090ea1ac512a2b2f479cc64192fd1d527a7f3627671268d08ed5ac418c", size = 50270 },
+]
+
+[[package]]
+name = "wordllama"
+version = "0.3.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pydantic" },
+    { name = "requests" },
+    { name = "safetensors" },
+    { name = "tokenizers" },
+    { name = "toml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/04/36/ea60954a12092273c274c832c1d9cc569bef4907b4cf5b792606adfe884f/wordllama-0.3.9.tar.gz", hash = "sha256:a79b45fe82b3776b6bacb9344d32ce5e9a53f66686e2299769e9a10184d192f5", size = 17457371 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5e/b8/d3ff032e0a4f4a275b38730b80be19200afec64c7b767164ec997d178024/wordllama-0.3.9-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:f28bfc304d010b260c247f753718b0f75aab84151f6d8beee4ce579c763cd9cd", size = 17312231 },
+    { url = "https://files.pythonhosted.org/packages/b4/0e/78059de49f0ef75f1a66117a2095a91613d5d5a21eec46172fb5ee7a0421/wordllama-0.3.9-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:5d653cb319b2af16805707598f46e9f14f6f575e78c1c4df644ad35f6e947d2e", size = 17160610 },
+    { url = "https://files.pythonhosted.org/packages/34/51/57a1d3da6fd3f3e60931eab9c8e181d86cbcd3dfccce9da4112f9a295374/wordllama-0.3.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6fe8f5bea3cacb8bca412ee57feca0393962e208718778654bd2eef10c87f3f6", size = 19150772 },
+    { url = "https://files.pythonhosted.org/packages/b2/6e/236f3d0ef037be9f8b6629aa48d3a2096813f25cfb62f66f9f3aa1f948ca/wordllama-0.3.9-cp312-cp312-win_amd64.whl", hash = "sha256:6e80929ef547706c9821987bc908be72a6751997e2377af4c21db6f16cc89925", size = 16902082 },
+    { url = "https://files.pythonhosted.org/packages/eb/7c/9ad9e4919e2378e1194320c83b780fdc4be1ed963094461f9cb2c3c83b1a/wordllama-0.3.9-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:de75650f3dc5d0b1961f5b60d6e4e52338177bcda28d165c48093f6ebf4c4f61", size = 17329990 },
+    { url = "https://files.pythonhosted.org/packages/c1/ad/f0b9be53363ed732507b886f7299619087a61f3dc9b29deb767c3aa31d17/wordllama-0.3.9-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:1206c255fcd36e7a1123a6c871eccc4baeed25bb91ed66b041712604e674121f", size = 17162416 },
+    { url = "https://files.pythonhosted.org/packages/b0/0d/e025c4f40994a1e912e5a7c4a7505de7d1493148227850d522355913a885/wordllama-0.3.9-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c3a01f5e1339ead043845719aa9447b6003dc56f069e07192408f097443faede", size = 19136832 },
+    { url = "https://files.pythonhosted.org/packages/81/8b/4aaa8bfe4b52738ee558dd80172bb4a6c66f9a03fc63fa075304b050d3cb/wordllama-0.3.9-cp313-cp313-win_amd64.whl", hash = "sha256:e7892c3012cae5271900cb72c342bbf1b4f9b08b6ce825ac8742bbeaf64fca2f", size = 16900322 },
 ]
 
 [[package]]
