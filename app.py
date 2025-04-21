@@ -63,6 +63,11 @@ st.markdown(
 .close-button:hover {
   color: #333;
 }
+
+/* Override Streamlit's subheader to be smaller */
+h3 {
+    font-size: 1.25rem !important;
+}
 </style>
 """,
     unsafe_allow_html=True,
