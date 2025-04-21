@@ -1,4 +1,5 @@
 import json
+import time
 from html import escape
 from pprint import pprint
 
@@ -329,12 +330,20 @@ def main():
                 custom_params.update(_kwargs)
             pprint(custom_params)
             splitter = selected_splitter["class_"](**custom_params)
+            
+            # Start timing
+            start_time = time.perf_counter()
+            
             if hasattr(splitter, "create_documents"):
                 chunks = splitter.create_documents([input_text])
                 # chunks = [chunk for chunk in chunks if (chunk.metadata.get("start_index") != -1)]
             else:
                 chunks = splitter.split_text(input_text)
-
+            
+            # End timing
+            end_time = time.perf_counter()
+            split_duration = (end_time - start_time) * 1000  # Convert to milliseconds
+            
             # Get overlaps between chunks
             overlaps = identify_overlaps(
                 chunks, chunk_size=custom_params.get("chunk_size"), chunk_overlap=custom_params.get("chunk_overlap")
@@ -356,7 +365,7 @@ def main():
                         chunk.metadata[f"tokens_{tokenizer_name}"] = len(tokenizer.encode(text))
 
             # Display results
-            st.subheader("Split Results")
+            st.subheader(f"Split Results (took {split_duration:.1f} ms)")
             content = chunk_container_styles
             content += "<div class='chunk-container'>"
 
