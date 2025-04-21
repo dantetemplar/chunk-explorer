@@ -84,7 +84,9 @@ SPLITTERS: list[Splitter] = [
     {
         "class_": WordLlamaTextSplitter,
         "kwargs": {
-            "target_size": 100,
+            "target_size": 200,
+            "intermediate_size": 20,
+            "cleanup_size": 5,
         },
         "name": "🦙 WordLlamaTextSplitter",
         "showcase_text": TEXT_PLAIN,
