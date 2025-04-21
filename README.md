@@ -2,7 +2,7 @@
 
 A powerful tool for exploring and visualizing different text chunking strategies, designed to help you understand how various text splitters work with different types of content.
 
-## 🚀 [Try the Demo](https://chunkers.streamlit.app/)
+## 🚀 [Try it here](https://chunkers.streamlit.app/)
 
 
 https://github.com/user-attachments/assets/3aabf071-15f6-4302-9678-a76b6c766123
