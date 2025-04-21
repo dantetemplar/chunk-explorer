@@ -235,13 +235,31 @@ chunks.forEach(chunk => {
 
 # Main Streamlit app
 def main():
+    # Create a mapping of splitter names to indices
+    splitter_name_to_index = {splitter["name"]: i for i, splitter in enumerate(SPLITTERS)}
+    
+    # Handle query parameters
+    if "splitter" in st.query_params:
+        splitter_name = st.query_params["splitter"]
+        splitter_index = splitter_name_to_index.get(splitter_name, 0)
+    else:
+        splitter_index = 0
+
     # Create a sidebar for splitter selection
     st.sidebar.title("Splitter Selection")
 
     # Create a vertical column for splitter selection
     selected_splitter_index = st.sidebar.radio(
-        "Choose a text splitter:", range(len(SPLITTERS)), format_func=lambda i: SPLITTERS[i]["name"]
+        "Choose a text splitter:", 
+        range(len(SPLITTERS)), 
+        format_func=lambda i: SPLITTERS[i]["name"],
+        index=splitter_index,
+        key="selected_splitter_index",
+        on_change=lambda: st.query_params.update({"splitter": SPLITTERS[st.session_state.selected_splitter_index]["name"]})
     )
+
+    # Update query params when splitter changes
+    st.query_params["splitter"] = SPLITTERS[selected_splitter_index]["name"]
 
     selected_splitter = SPLITTERS[selected_splitter_index]
     selected_splitter_name = selected_splitter["name"]
