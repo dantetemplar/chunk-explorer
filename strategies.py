@@ -260,18 +260,10 @@ def create_widget_for_param(
                 return r
             return None
 
-    # For unknown types, try parsing as JSON
-    try:
-        input_value = st.text_area(
-            name, value=json.dumps(default) if default is not None else "", help=str(param_type), disabled=disabled
-        )
-        if input_value:
-            return json.loads(input_value)
-        return default if default is not None else ""
-    except json.JSONDecodeError:
-        st.error(f"Invalid JSON format for {name}. Using default value.")
-        return default if default is not None else ""
-
+    # For unknown types, just display the type
+    print(f"Unknown type: {param_type}, default: {default}")
+    st.text_input(name, value=str(default), help=str(param_type), disabled=True)
+    return default
 
 def adapt_langchain_splitter_to_streamlit(splitter: Splitter) -> dict:
     """Get user inputs for splitter parameters."""
@@ -399,7 +391,7 @@ def identify_overlaps(
                 overlaps[i] = (left, right)
             continue
 
-        assert s2 > s1, f"s2 must be greater than s1, but s1={s1}, s2={s2}"
+        assert s2 >= s1, f"s2 must be greater than s1, but s1={s1}, s2={s2}"
         left = s2 - s1 - len_1
         right = s1 - s2 + len_1
 
