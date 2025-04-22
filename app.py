@@ -439,6 +439,8 @@ def main():
 
             html(content, scrolling=True, height=1000)
         except Exception as e:
+            st.error(f"Error during text splitting: {str(e)}")
+            st.error("Please check your input text and splitter parameters.")
             raise e
 
     # Perform split automatically when text or parameters change
