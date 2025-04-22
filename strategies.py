@@ -127,17 +127,18 @@ def type_equals(a: Any, b: Any) -> bool:
 
 
 def create_widget_for_param(
-    name: str, param_type: Any, default: Any, length_functions: dict[str, Any], disabled: bool = False
+    name: str, param_type: Any, default: Any, length_functions: dict[str, Any], disabled: bool = False, original_type: Any = None
 ) -> Any:
     """Create a Streamlit widget for a parameter based on its type."""
 
+    help_type = original_type or param_type
     if name == "length_function":
         # Special handling for length_function
         func_value = st.selectbox(
             name,
             options=list(length_functions.keys()),
             index=list(length_functions.keys()).index("len"),
-            help=f"Function to measure the length of text chunks (type: {param_type})",
+            help=f"Function to measure the length of text chunks (type: {help_type})",
             disabled=disabled,
         )
         if func_value:
@@ -145,17 +146,17 @@ def create_widget_for_param(
         return None
     elif name == "add_start_index":  # always add start index
         return st.checkbox(
-            name, value=True, help=f"Always add start index to the chunk metadata (type: {param_type})", disabled=True
+            name, value=True, help=f"Always add start index to the chunk metadata (type: {help_type})", disabled=True
         )
     elif param_type is bool:
         return st.checkbox(
-            name, value=default if default is not None else False, help=str(param_type), disabled=disabled
+            name, value=default if default is not None else False, help=str(help_type), disabled=disabled
         )
     elif param_type is str:
         value = st.text_input(
             name,
             value=json.dumps(default) if default is not None else None,
-            help=str(param_type),
+            help=str(help_type),
             disabled=disabled,
             placeholder='"Hello world" or "\\n"',
         )
@@ -163,12 +164,12 @@ def create_widget_for_param(
             return json.loads(value)
         return None
     elif param_type is int:
-        int_value = st.number_input(name, value=default, step=1, help=str(param_type), disabled=disabled, min_value=0)
+        int_value = st.number_input(name, value=default, step=1, help=str(help_type), disabled=disabled, min_value=0)
         if int_value is not None:
             return int(int_value)
         return None
     elif param_type is float:
-        float_value = st.number_input(name, value=default, help=str(param_type), disabled=disabled, min_value=0.0)
+        float_value = st.number_input(name, value=default, help=str(help_type), disabled=disabled, min_value=0.0)
         if float_value is not None:
             return float(float_value)
     elif type_equals(param_type, list[str]):
@@ -176,7 +177,7 @@ def create_widget_for_param(
             separator_input = st.text_input(
                 name,
                 value=json.dumps(default) if default is not None else None,
-                help=f"Enter separators as json array ({param_type})",
+                help=f"Enter separators as json array ({help_type})",
                 disabled=disabled,
                 placeholder='[" ", "\\n\\n", "\\n"]',
             )
@@ -187,7 +188,7 @@ def create_widget_for_param(
             text_input = st.text_input(
                 name,
                 value=json.dumps(default) if default is not None else None,
-                help=f"Enter values as json array ({param_type})",
+                help=f"Enter values as json array ({help_type})",
                 disabled=disabled,
                 placeholder='["Hello", "World"]',
             )
@@ -199,7 +200,7 @@ def create_widget_for_param(
         # make two columns, one with toggle for None, one with the type
         toggle_col, type_col = st.columns([1, 2])
         with toggle_col:
-            toggle_value = st.checkbox(name, value=default is not None, help=str(param_type))
+            toggle_value = st.checkbox(name, value=default is not None, help=str(help_type))
 
         is_none = not toggle_value
 
@@ -207,7 +208,7 @@ def create_widget_for_param(
             # exclude None from the type
             new_args = [t for t in typing.get_args(param_type) if t is not type(None)]
             new_type = typing.get_origin(param_type)[*new_args]
-            value = create_widget_for_param(name, new_type, default, length_functions, disabled=is_none)
+            value = create_widget_for_param(name, new_type, default, length_functions, disabled=is_none, original_type=param_type)
         if is_none:
             return None
         if value:
@@ -235,7 +236,7 @@ def create_widget_for_param(
                 options=options,
                 index=options.index(default) if default is not None else 0,
                 format_func=json.dumps,
-                help=str(param_type),
+                help=str(help_type),
                 disabled=disabled,
             )
 
@@ -250,7 +251,7 @@ def create_widget_for_param(
                 value=json.dumps(list(default) if isinstance(default, set) else default)
                 if default is not None
                 else None,
-                help=str(param_type),
+                help=str(help_type),
                 disabled=disabled,
             )
             if set_input:
