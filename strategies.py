@@ -163,12 +163,12 @@ def create_widget_for_param(
             return json.loads(value)
         return None
     elif param_type is int:
-        int_value = st.number_input(name, value=default, step=1, help=str(param_type), disabled=disabled)
+        int_value = st.number_input(name, value=default, step=1, help=str(param_type), disabled=disabled, min_value=0)
         if int_value is not None:
             return int(int_value)
         return None
     elif param_type is float:
-        float_value = st.number_input(name, value=default, help=str(param_type), disabled=disabled)
+        float_value = st.number_input(name, value=default, help=str(param_type), disabled=disabled, min_value=0.0)
         if float_value is not None:
             return float(float_value)
     elif type_equals(param_type, list[str]):
