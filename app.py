@@ -5,9 +5,11 @@ from pprint import pprint
 
 import chonkie
 import streamlit as st
+import torch
 from langchain_core.documents import Document
 from streamlit.components.v1 import html
 
+torch.classes.__path__ = []
 st.set_page_config(layout="wide", page_title="Chunking Strategies", page_icon=":scissors:")
 
 from strategies import SPLITTERS, TOKENIZERS, adapt_langchain_splitter_to_streamlit, identify_overlaps  # noqa: E402
