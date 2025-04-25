@@ -3,6 +3,7 @@ import time
 from html import escape
 from pprint import pprint
 
+import chonkie
 import streamlit as st
 from langchain_core.documents import Document
 from streamlit.components.v1 import html
@@ -272,7 +273,7 @@ def main():
 
     # Create a dictionary of text examples
     text_examples = {
-        "🎯 Showcase": selected_splitter["showcase_text"],
+        "🎯 Showcase": selected_splitter.get("showcase_text") or TEXT_PLAIN,
         "📝 Plain Text": TEXT_PLAIN,
         "🐍 Python Code": TEXT_PYTHON,
         "🖥️ JavaScript Code": TEXT_JS,
@@ -284,7 +285,7 @@ def main():
     selected_text_name = st.sidebar.radio("Choose example text:", list(text_examples.keys()))
 
     # Initialize session state for text if not exists
-    if "input_text" not in st.session_state:
+    if "input_text" not in st.session_state and "showcase_text" in selected_splitter:
         st.session_state.input_text = selected_splitter["showcase_text"]
 
     # Update text only if it's not the showcase option or if it hasn't been modified
@@ -316,8 +317,10 @@ def main():
                 st.markdown(f"**{tokenizer_name}**")
                 tokens = tokenizer.encode(current_text)
                 st.markdown(f"Tokens: {len(tokens)}")
-
-    st.subheader(selected_splitter_name)
+    if link_to_docs := selected_splitter.get("link"):
+        st.subheader(f"[{selected_splitter_name}]({link_to_docs})")
+    else:
+        st.subheader(selected_splitter_name)
     with st.expander(f"{selected_splitter['class_'].__name__} **Documentation** and its baseclasses", expanded=False):
         st.help(selected_splitter["class_"])
         # also baseclasses
@@ -361,6 +364,13 @@ def main():
             if hasattr(splitter, "create_documents"):
                 chunks = splitter.create_documents([input_text])
                 # chunks = [chunk for chunk in chunks if (chunk.metadata.get("start_index") != -1)]
+            elif issubclass(type(splitter), chonkie.BaseChunker):
+                _chunks: list[chonkie.Chunk] = splitter.chunk(input_text)
+                chunks = []
+                for _chunk in _chunks:
+                    metadata = _chunk.to_dict()
+                    metadata.pop("text")
+                    chunks.append(Document(page_content=_chunk.text, metadata=metadata))
             else:
                 chunks = splitter.split_text(input_text)
             
@@ -431,7 +441,7 @@ def main():
                     )
 
                 escaped = escaped.replace("\n", "<span class='chunk-line-break'></span>\n")
-                metadata = escape(json.dumps(metadata))
+                metadata = escape(json.dumps(metadata, default=str))
                 content += f"<span class='chunk' data-index='{i}' data-metadata='{metadata}'>{escaped}</span>"
 
             content += "</div>"

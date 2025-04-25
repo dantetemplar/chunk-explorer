@@ -2,23 +2,17 @@ import inspect
 import itertools
 import json
 import typing
-from typing import Any, TypedDict
+from typing import Any, NotRequired, TypedDict
 
+import chonkie
+import langchain_text_splitters
 import streamlit as st
 import tiktoken
 from langchain_core.documents import Document
-from langchain_text_splitters import (
-    CharacterTextSplitter,
-    HTMLHeaderTextSplitter,
-    MarkdownHeaderTextSplitter,
-    NLTKTextSplitter,
-    RecursiveCharacterTextSplitter,
-    SpacyTextSplitter,
-    TokenTextSplitter,
-)
 from transformers import AutoTokenizer
+from tree_sitter_language_pack import SupportedLanguage  # noqa: F401
 
-from texts import TEXT_HTML, TEXT_MARKDOWN, TEXT_PLAIN
+from texts import TEXT_HTML, TEXT_MARKDOWN, TEXT_PLAIN, TEXT_PYTHON
 from wordllama_adapter import WordLlamaTextSplitter
 
 
@@ -26,18 +20,22 @@ class Splitter(TypedDict):
     class_: type
     kwargs: dict[str, Any]
     name: str
-    showcase_text: str
+    showcase_text: NotRequired[str]
+    link: NotRequired[str]
+    do_not_propagate_kwargs: NotRequired[bool]
+    except_properties: NotRequired[list[str]]
 
 
 SPLITTERS: list[Splitter] = [
     {
-        "class_": RecursiveCharacterTextSplitter,
-        "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False, "add_start_index": True},
         "name": "🦜🔗 RecursiveCharacterTextSplitter",
-        "showcase_text": TEXT_PLAIN,
+        "class_": langchain_text_splitters.RecursiveCharacterTextSplitter,
+        "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False},
+        "link": "https://python.langchain.com/api_reference/text_splitters/character/langchain_text_splitters.character.RecursiveCharacterTextSplitter.html",
     },
     {
-        "class_": CharacterTextSplitter,
+        "name": "🦜🔗 CharacterTextSplitter",
+        "class_": langchain_text_splitters.CharacterTextSplitter,
         "kwargs": {
             "chunk_size": 100,
             "chunk_overlap": 0,
@@ -45,59 +43,114 @@ SPLITTERS: list[Splitter] = [
             "keep_separator": True,
             "add_start_index": True,
         },
-        "name": "🦜🔗 CharacterTextSplitter",
-        "showcase_text": TEXT_PLAIN,
+        "link": "https://python.langchain.com/api_reference/text_splitters/character/langchain_text_splitters.character.CharacterTextSplitter.html",
     },
     {
-        "class_": TokenTextSplitter,
-        "kwargs": {"chunk_size": 50, "chunk_overlap": 0, "encoding_name": "cl100k_base", "add_start_index": True},
         "name": "🦜🔗 TokenTextSplitter",
-        "showcase_text": TEXT_PLAIN,
+        "class_": langchain_text_splitters.TokenTextSplitter,
+        "kwargs": {"chunk_size": 50, "chunk_overlap": 0, "encoding_name": "cl100k_base"},
+        "link": "https://python.langchain.com/api_reference/text_splitters/base/langchain_text_splitters.base.TokenTextSplitter.html",
     },
     {
-        "class_": MarkdownHeaderTextSplitter,
+        "name": "🦜🔗 MarkdownHeaderTextSplitter",
+        "class_": langchain_text_splitters.MarkdownHeaderTextSplitter,
         "kwargs": {
             "headers_to_split_on": [("#", "Header 1"), ("##", "Header 2"), ("###", "Header 3")],
             "strip_headers": False,
         },
-        "name": "🦜🔗 MarkdownHeaderTextSplitter",
         "showcase_text": TEXT_MARKDOWN,
+        "link": "https://python.langchain.com/api_reference/text_splitters/markdown/langchain_text_splitters.markdown.MarkdownHeaderTextSplitter.html",
     },
     {
-        "class_": HTMLHeaderTextSplitter,
-        "kwargs": {"headers_to_split_on": [("h1", "Main Topic"), ("h2", "Sub Topic")]},
         "name": "🦜🔗 HTMLHeaderTextSplitter",
+        "class_": langchain_text_splitters.HTMLHeaderTextSplitter,
+        "kwargs": {"headers_to_split_on": [("h1", "Main Topic"), ("h2", "Sub Topic")]},
         "showcase_text": TEXT_HTML,
+        "link": "https://python.langchain.com/api_reference/text_splitters/html/langchain_text_splitters.html.HTMLHeaderTextSplitter.html",
     },
     {
-        "class_": NLTKTextSplitter,
-        "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False},
         "name": "🦜🔗 NLTKTextSplitter",
-        "showcase_text": TEXT_PLAIN,
-    },
-    {
-        "class_": SpacyTextSplitter,
+        "class_": langchain_text_splitters.NLTKTextSplitter,
         "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False},
-        "name": "🦜🔗 SpacyTextSplitter",
-        "showcase_text": TEXT_PLAIN,
+        "link": "https://python.langchain.com/api_reference/text_splitters/nltk/langchain_text_splitters.nltk.NLTKTextSplitter.html",
     },
     {
+        "name": "🦜🔗 SpacyTextSplitter",
+        "class_": langchain_text_splitters.SpacyTextSplitter,
+        "kwargs": {"chunk_size": 100, "chunk_overlap": 0, "strip_whitespace": False},
+        "link": "https://python.langchain.com/api_reference/text_splitters/spacy/langchain_text_splitters.spacy.SpacyTextSplitter.html",
+    },
+    # {
+    #     "name": "🦜🔗 PythonCodeTextSplitter",
+    #     "class_": langchain_text_splitters.PythonCodeTextSplitter,
+    #     "kwargs": {},
+    #     "showcase_text": TEXT_PYTHON,
+    #     "link": "https://python.langchain.com/api_reference/text_splitters/python/langchain_text_splitters.python.PythonCodeTextSplitter.html",
+    #     "except_properties": ["separators"],
+    # },
+    {
+        "name": "🦙 WordLlama TextSplitter",
         "class_": WordLlamaTextSplitter,
-        "kwargs": {
-            "target_size": 200,
-            "intermediate_size": 20,
-            "cleanup_size": 5,
-        },
-        "name": "🦙 WordLlamaTextSplitter",
+        "kwargs": {"target_size": 200, "intermediate_size": 20, "cleanup_size": 5},
         "showcase_text": TEXT_PLAIN,
+        "link": "https://github.com/dleemiller/WordLlama/blob/main/tutorials/blog/semantic_split/wl_semantic_blog.md",
+    },
+    {
+        "name": "🦛 Chonkie TokenChunker",
+        "class_": chonkie.TokenChunker,
+        "kwargs": {"chunk_size": 100},
+        "link": "https://docs.chonkie.ai/chunkers/token-chunker",
+    },
+    {
+        "name": "🦛 Chonkie SentenceChunker",
+        "class_": chonkie.SentenceChunker,
+        "kwargs": {"chunk_size": 100},
+        "link": "https://docs.chonkie.ai/chunkers/sentence-chunker",
+    },
+    {
+        "name": "🦛 Chonkie RecursiveChunker",
+        "class_": chonkie.RecursiveChunker,
+        "kwargs": {"chunk_size": 100},
+        "link": "https://docs.chonkie.ai/chunkers/recursive-chunker",
+    },
+    {
+        "name": "🦛 Chonkie SemanticChunker",
+        "class_": chonkie.SemanticChunker,
+        "kwargs": {"chunk_size": 100},
+        "link": "https://docs.chonkie.ai/chunkers/semantic-chunker",
+        "do_not_propagate_kwargs": True,
+    },
+    {
+        "name": "🦛 Chonkie SDPMChunker",
+        "class_": chonkie.SDPMChunker,
+        "kwargs": {"chunk_size": 100},
+        "link": "https://docs.chonkie.ai/chunkers/sdpm-chunker",
+    },
+    {
+        "name": "🦛 Chonkie LateChunker",
+        "class_": chonkie.LateChunker,
+        "kwargs": {"chunk_size": 100},
+        "link": "https://docs.chonkie.ai/chunkers/late-chunker",
+        "do_not_propagate_kwargs": True,
+    },
+    {
+        "name": "🦛 Chonkie CodeChunker",
+        "class_": chonkie.CodeChunker,
+        "kwargs": {"chunk_size": 100},
+        "showcase_text": TEXT_PYTHON,
+        "link": "https://docs.chonkie.ai/chunkers/code-chunker",
+        "do_not_propagate_kwargs": True,
     },
 ]
 """
-Splitters from https://python.langchain.com/api_reference/text_splitters/index.html
+Splitters:
+- https://python.langchain.com/api_reference/text_splitters/index.html
+- https://docs.chonkie.ai/chunkers/overview
+- https://github.com/dleemiller/WordLlama/blob/main/tutorials/blog/semantic_split/wl_semantic_blog.md
 """
 
 
-@st.cache_resource
+# @st.cache_resource
 def tokenizers():
     return {
         "cl100k_base": tiktoken.get_encoding("cl100k_base"),
@@ -127,11 +180,19 @@ def type_equals(a: Any, b: Any) -> bool:
 
 
 def create_widget_for_param(
-    name: str, param_type: Any, default: Any, length_functions: dict[str, Any], disabled: bool = False, original_type: Any = None
+    name: str,
+    param_type: Any,
+    default: Any,
+    length_functions: dict[str, Any],
+    disabled: bool = False,
+    original_type: Any = None,
+    chunk_size: int | None = None,
 ) -> Any:
     """Create a Streamlit widget for a parameter based on its type."""
 
     help_type = original_type or param_type
+    origin = typing.get_origin(param_type)
+    args = typing.get_args(param_type)
     if name == "length_function":
         # Special handling for length_function
         func_value = st.selectbox(
@@ -148,6 +209,14 @@ def create_widget_for_param(
         return st.checkbox(
             name, value=True, help=f"Always add start index to the chunk metadata (type: {help_type})", disabled=True
         )
+    elif name == "return_type" and set(args) == {"chunks", "texts"}:
+        return st.selectbox(
+            name,
+            options=args,
+            index=args.index("chunks"),
+            help=f'Always use return_type="chunks" to keep metadata (type: {help_type})',
+            disabled=True,
+        )
     elif param_type is bool:
         return st.checkbox(
             name, value=default if default is not None else False, help=str(help_type), disabled=disabled
@@ -163,8 +232,14 @@ def create_widget_for_param(
         if value:
             return json.loads(value)
         return None
-    elif param_type is int:
-        int_value = st.number_input(name, value=default, step=1, help=str(help_type), disabled=disabled, min_value=0)
+    elif param_type is int or name == "chunk_overlap":
+        if name == "chunk_overlap" and chunk_size is not None:
+            max_value = chunk_size
+        else:
+            max_value = None
+        int_value = st.number_input(
+            name, value=default, step=1, help=str(help_type), disabled=disabled, min_value=0, max_value=max_value
+        )
         if int_value is not None:
             return int(int_value)
         return None
@@ -195,8 +270,7 @@ def create_widget_for_param(
             if text_input:
                 return json.loads(text_input)
             return None
-
-    elif typing.get_origin(param_type) is typing.Union and type(None) in typing.get_args(param_type):
+    elif origin is typing.Union and type(None) in args:
         # make two columns, one with toggle for None, one with the type
         toggle_col, type_col = st.columns([1, 2])
         with toggle_col:
@@ -206,17 +280,17 @@ def create_widget_for_param(
 
         with type_col:
             # exclude None from the type
-            new_args = [t for t in typing.get_args(param_type) if t is not type(None)]
-            new_type = typing.get_origin(param_type)[*new_args]
-            value = create_widget_for_param(name, new_type, default, length_functions, disabled=is_none, original_type=param_type)
+            new_args = [t for t in args if t is not type(None)]
+            new_type = typing.Union[*new_args]
+            value = create_widget_for_param(
+                name, new_type, default, length_functions, disabled=is_none, original_type=param_type
+            )
         if is_none:
             return None
         if value:
             return value
         return None
-    elif typing.get_origin(param_type) is typing.Union:
-        args = typing.get_args(param_type)
-
+    elif origin is typing.Union:
         # if all args are Literal, use a selectbox
         all_literals = True
         options: list[Any] = []
@@ -229,6 +303,7 @@ def create_widget_for_param(
             else:
                 all_literals = False
                 break
+        print(name, all_literals)
 
         if all_literals:
             return st.selectbox(
@@ -266,6 +341,7 @@ def create_widget_for_param(
     st.text_input(name, value=str(default), help=str(param_type), disabled=True)
     return default
 
+
 def adapt_langchain_splitter_to_streamlit(splitter: Splitter) -> dict:
     """Get user inputs for splitter parameters."""
     splitter_class = splitter["class_"]
@@ -284,7 +360,7 @@ def adapt_langchain_splitter_to_streamlit(splitter: Splitter) -> dict:
     call_defaults: dict[str, Any] = {}
 
     # Get type hints and default values for the class
-    type_hints = typing.get_type_hints(splitter_class.__init__)
+    type_hints = typing.get_type_hints(splitter_class.__init__, localns={"SupportedLanguage": SupportedLanguage})
     for name, param in inspect.signature(splitter_class.__init__).parameters.items():
         if name not in type_hints:
             type_hints[name] = param.annotation
@@ -294,8 +370,8 @@ def adapt_langchain_splitter_to_streamlit(splitter: Splitter) -> dict:
             if name not in call_defaults:
                 call_defaults[name] = param.default
 
-    # and its base classes if **kwargs
-    if "kwargs" in type_hints:
+    # and its base classes if **kwargs passed to the super()
+    if "kwargs" in type_hints and not splitter.get("do_not_propagate_kwargs", False):
         for base in splitter_class.__bases__:
             for k, v in typing.get_type_hints(base.__init__).items():
                 if k not in type_hints:
@@ -317,26 +393,34 @@ def adapt_langchain_splitter_to_streamlit(splitter: Splitter) -> dict:
     col_idx = 0
 
     # Sort type_hits such way:
-    # - chunk_*** parameters should be first
+    # - chunk_size parameters should be first
+    # - chunk_overlapr should be second
     # - booleans should be in the end
     def key(x):
-        if x[0].startswith("chunk_"):
+        if x[0] == "chunk_size":
             return 0, x[0]
-        else:
+        elif x[0] == "chunk_overlap":
             return 1, x[0]
+        else:
+            return 2, x[0]
 
     sorted_type_hints = list(sorted(type_hints.items(), key=key))
+    if splitter.get("except_properties"):
+        sorted_type_hints = [x for x in sorted_type_hints if x[0] not in splitter["except_properties"]]
     booleans = [x for x in sorted_type_hints if x[1] is bool]
     sorted_type_hints = [x for x in sorted_type_hints if x[1] is not bool]
+    chunk_size = None
     # First display all non-boolean parameters
     for name, param_type in sorted_type_hints:
         # Get default value: first try SPLITTERS, then signature default
         default = defaults.get(name)
         # Use alternating columns
         with cols[col_idx]:
-            value = create_widget_for_param(name, param_type, default, length_functions)
+            value = create_widget_for_param(name, param_type, default, length_functions, chunk_size=chunk_size)
             if value is not None:
                 params[name] = value
+            if name == "chunk_size":
+                chunk_size = value
         col_idx = (col_idx + 1) % 2
 
     booleans_cols = st.columns(5)
@@ -402,14 +486,3 @@ def identify_overlaps(
         overlaps[i] = (left, right)
 
     return overlaps
-
-
-if __name__ == "__main__":
-    splitter = TokenTextSplitter(
-        chunk_size=200,
-        chunk_overlap=20,
-        encoding_name="cl100k_base",
-    )
-    chunks = splitter.create_documents([TEXT_PLAIN])
-
-    print(chunks)
