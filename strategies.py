@@ -486,3 +486,13 @@ def identify_overlaps(
         overlaps[i] = (left, right)
 
     return overlaps
+
+
+@st.cache_resource
+def install_nltk():
+    import nltk
+
+    # Download the punkt tokenizer
+    nltk.download("punkt_tab")
+
+install_nltk()
